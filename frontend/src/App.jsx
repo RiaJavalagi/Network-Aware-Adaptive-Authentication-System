@@ -4,9 +4,9 @@ import { Shield, Network, Lock, Cpu, CheckCircle } from 'lucide-react';
 
 export default function App() {
   const phases = [
-    { num: '01', title: 'Architecture & Connectivity', status: 'active', desc: 'FastAPI + React baseline, Git repo, and /api/health probe' },
-    { num: '02', title: 'Database & Alembic', status: 'upcoming', desc: 'PostgreSQL schema with users, sessions, devices, and audit tables' },
-    { num: '03', title: 'Argon2id Auth', status: 'upcoming', desc: 'Password hashing, registration, login, and secure sessions' },
+    { num: '01', title: 'Architecture & Connectivity', status: 'completed', desc: 'FastAPI + React baseline, Git repo, and /api/health probe' },
+    { num: '02', title: 'Database & Alembic', status: 'completed', desc: 'PostgreSQL schema with 7 models, indexes, cascades, and migrations' },
+    { num: '03', title: 'Argon2id Auth', status: 'active', desc: 'Password hashing, registration, login, and secure sessions' },
     { num: '04', title: 'TOTP 2FA', status: 'upcoming', desc: 'QR code enrollment, clock skew tolerance, encrypted secrets' },
     { num: '05', title: 'Network Intelligence', status: 'upcoming', desc: 'Trusted proxy IP analysis, subnet monitoring, traffic logging' },
     { num: '06', title: 'Device Recognition', status: 'upcoming', desc: 'Device fingerprinting, known/unknown detection, revocation' },
@@ -23,7 +23,7 @@ export default function App() {
       {/* Top Header */}
       <header style={{ marginBottom: '2.5rem', textAlign: 'center' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-          <span className="badge badge-info">Phase 1 Initialized</span>
+          <span className="badge badge-info">Phase 2 Completed</span>
           <span className="badge badge-success">Cybersecurity Project</span>
         </div>
         <h1 style={{ 
@@ -101,17 +101,19 @@ export default function App() {
               <div 
                 key={p.num} 
                 style={{ 
-                  background: p.status === 'active' ? 'rgba(6, 182, 212, 0.08)' : 'rgba(30, 41, 59, 0.3)',
-                  border: `1px solid ${p.status === 'active' ? 'rgba(6, 182, 212, 0.4)' : 'var(--border-subtle)'}`,
+                  background: p.status === 'completed' ? 'rgba(16, 185, 129, 0.06)' : p.status === 'active' ? 'rgba(6, 182, 212, 0.08)' : 'rgba(30, 41, 59, 0.3)',
+                  border: `1px solid ${p.status === 'completed' ? 'rgba(16, 185, 129, 0.35)' : p.status === 'active' ? 'rgba(6, 182, 212, 0.4)' : 'var(--border-subtle)'}`,
                   borderRadius: '8px',
                   padding: '0.875rem',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-                  <span className="font-mono" style={{ fontSize: '0.75rem', color: p.status === 'active' ? 'var(--accent-cyan)' : 'var(--text-dim)' }}>
+                  <span className="font-mono" style={{ fontSize: '0.75rem', color: p.status === 'completed' ? '#34d399' : p.status === 'active' ? 'var(--accent-cyan)' : 'var(--text-dim)' }}>
                     PHASE {p.num}
                   </span>
-                  {p.status === 'active' ? (
+                  {p.status === 'completed' ? (
+                    <span className="badge badge-success" style={{ fontSize: '0.65rem', padding: '0.15rem 0.45rem' }}>Done</span>
+                  ) : p.status === 'active' ? (
                     <span className="badge badge-info" style={{ fontSize: '0.65rem', padding: '0.15rem 0.45rem' }}>Active</span>
                   ) : (
                     <span style={{ fontSize: '0.65rem', color: 'var(--text-dim)' }}>Planned</span>

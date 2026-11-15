@@ -14,6 +14,7 @@ cryptography==42.0.8
 # Database & ORM
 SQLAlchemy==2.0.31
 asyncpg==0.29.0
+aiosqlite==0.22.1
 alembic==1.13.2
 
 # Cache & Rate Limiting

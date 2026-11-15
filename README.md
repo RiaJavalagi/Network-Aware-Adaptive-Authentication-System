@@ -69,8 +69,8 @@ The system dynamically analyzes authentication attempts and connection metadata 
 | Phase | Description | Status |
 |---|---|---|
 | **Phase 1** | Project Structure, Git, React + Vite, FastAPI, and Connectivity | **Completed** |
-| **Phase 2** | PostgreSQL, SQLAlchemy Models, Alembic Migrations | Upcoming |
-| **Phase 3** | User Registration, Login, Argon2id Password Hashing, Session Management | Upcoming |
+| **Phase 2** | PostgreSQL, SQLAlchemy Models, Alembic Migrations | **Completed** |
+| **Phase 3** | User Registration, Login, Argon2id Password Hashing, Session Management | **Active** |
 | **Phase 4** | TOTP Enrollment (QR Code), Verification, Skew Handling, Secret Encryption | Upcoming |
 | **Phase 5** | Nginx Reverse Proxy, Network Metadata Extraction, Subnet Logging | Upcoming |
 | **Phase 6** | Device Recognition, Fingerprinting, Trust & Revocation Registry | Upcoming |

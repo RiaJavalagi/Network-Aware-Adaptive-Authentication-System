@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app import __version__
 from backend.app.config import get_settings
+from backend.app.models import Base
 from backend.app.schemas.health import HealthResponse
 
 settings = get_settings()
@@ -39,13 +40,14 @@ async def add_security_headers(request: Request, call_next):
 @app.get("/api/health", response_model=HealthResponse, tags=["System"])
 async def health_check() -> HealthResponse:
     """Return health status, environment mode, and connected subsystem status."""
+    model_count = len(Base.metadata.tables)
     return HealthResponse(
         status="ok",
         version=__version__,
         environment=settings.ENVIRONMENT,
         services={
             "api": "healthy",
-            "database": "configured" if settings.DATABASE_URL else "pending",
+            "database": f"configured ({model_count} models registered)" if settings.DATABASE_URL else "pending",
             "redis": "configured" if settings.REDIS_URL else "pending",
         },
     )
