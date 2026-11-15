@@ -2,12 +2,26 @@ from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app import __version__
 from backend.app.config import get_settings
+from contextlib import asynccontextmanager
+from backend.app.database import init_models
 from backend.app.models import Base
 from backend.app.schemas.health import HealthResponse
 from backend.app.routers import auth, totp, devices, network, risk, security, simulation
 from backend.app.routers import evaluation
 
 settings = get_settings()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Automatically bootstrap database schema on startup."""
+    try:
+        await init_models()
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning(f"Database bootstrap warning: {e}")
+    yield
+
 
 app = FastAPI(
     title="Network-Aware Adaptive Authentication System",
@@ -16,6 +30,7 @@ app = FastAPI(
     docs_url="/api/docs",
     redoc_url="/api/redoc",
     openapi_url="/api/openapi.json",
+    lifespan=lifespan,
 )
 
 # CORS Configuration

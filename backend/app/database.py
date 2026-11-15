@@ -59,6 +59,26 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 
 async def init_models():
-    """Create all tables in the database (useful for testing or initial bootstrap)."""
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    """Create all tables in the database (useful for testing or initial bootstrap).
+    If PostgreSQL is unreachable in local dev mode, automatically falls back to local SQLite.
+    """
+    global engine, AsyncSessionLocal
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+    except Exception as e:
+        if "postgresql" in settings.DATABASE_URL and settings.ENVIRONMENT == "development":
+            logger.warning(f"PostgreSQL connection failed ({e}). Auto-switching to local SQLite for seamless testing.")
+            fallback_url = "sqlite+aiosqlite:///./adaptive_auth.db"
+            engine = create_async_engine(fallback_url, connect_args={"check_same_thread": False})
+            AsyncSessionLocal = async_sessionmaker(
+                bind=engine,
+                class_=AsyncSession,
+                autocommit=False,
+                autoflush=False,
+                expire_on_commit=False,
+            )
+            async with engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+        else:
+            raise
