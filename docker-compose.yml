@@ -1,0 +1,79 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: adaptive_auth_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-adaptive_auth_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: adaptive_auth_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: adaptive_auth_backend
+    restart: unless-stopped
+    environment:
+      ENVIRONMENT: production
+      PORT: 8000
+      HOST: 0.0.0.0
+      DEBUG: "false"
+      SECRET_KEY: ${SECRET_KEY:-prod_super_secure_random_key_64_bytes_entropy_token_2026}
+      TOTP_ENCRYPTION_KEY: ${TOTP_ENCRYPTION_KEY:-dGhpc19pc19hbl9leGFtcGxlXzMyX2J5dGVfa2V5PT0=}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-adaptive_auth_db}
+      REDIS_URL: redis://redis:6379/0
+      ALLOWED_ORIGINS: http://localhost,http://localhost:80,http://127.0.0.1
+      TRUSTED_PROXIES: 127.0.0.1,::1,nginx
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: adaptive_auth_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+  nginx:
+    image: nginx:alpine
+    container_name: adaptive_auth_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+      - frontend
+
+volumes:
+  pgdata:

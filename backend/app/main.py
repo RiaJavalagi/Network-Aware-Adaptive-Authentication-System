@@ -4,6 +4,8 @@ from backend.app import __version__
 from backend.app.config import get_settings
 from backend.app.models import Base
 from backend.app.schemas.health import HealthResponse
+from backend.app.routers import auth, totp, devices, network, risk, security, simulation
+from backend.app.routers import evaluation
 
 settings = get_settings()
 
@@ -35,6 +37,17 @@ async def add_security_headers(request: Request, call_next):
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     return response
+
+
+# Mount API Routers
+app.include_router(auth.router)
+app.include_router(totp.router)
+app.include_router(devices.router)
+app.include_router(network.router)
+app.include_router(risk.router)
+app.include_router(security.router)
+app.include_router(simulation.router)
+app.include_router(evaluation.router)
 
 
 @app.get("/api/health", response_model=HealthResponse, tags=["System"])
